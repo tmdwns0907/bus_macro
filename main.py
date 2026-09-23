@@ -39,12 +39,15 @@ def main():
     reservation.search()
 
     #reservation.select_time(config.TARGET_TIME)
-    
+    sleep_time = 2  # 2초 대기
     while(True):
         results = reservation.search_time(config.START_TIME, config.END_TIME)
         if results:
             send_message(notifier, results)
-        time.sleep(2)  # 2초 대기
+            sleep_time = 10  # 좌석 발견 시 대기 시간 증가
+        else:
+            sleep_time = 2  # 좌석 미발견 시 대기 시간 초기화
+        time.sleep(sleep_time)  # 지정된 시간 대기
         reservation.refresh()
 
     #reservation.select_seat()

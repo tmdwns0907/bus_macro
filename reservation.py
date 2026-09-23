@@ -1,3 +1,7 @@
+import logging
+
+logger = logging.getLogger(__name__)
+
 class Reservation:
     def __init__(self, page):
         self.page = page
@@ -46,25 +50,26 @@ class Reservation:
             try:
                 time_num = int(time_text.replace(" ", "").replace(":",""))
             except (ValueError, TypeError):
-                print(time_text + "정수로 변환할 수 없습니다.")
+                logger.debug(time_text + " 정수로 변환할 수 없습니다.")
                 continue
 
             if time_num == target_time:
                 bus = times.nth(i).locator("..")
 
                 remain = bus.locator("span.remain").inner_text().strip()
+                status = bus.locator("span.status").inner_text().strip()
 
-                print("시간:", time_text)
-                print("좌석:", remain)
+                logger.debug("시간:" + time_text)
+                logger.debug("좌석:" + remain)
 
-                if "매진" in remain:
-                    print("매진입니다.")
+                if "매진" in status:
+                    logger.debug("매진입니다.")
                     return False
 
                 bus.locator("span.btn_arrow").click()
                 return True
 
-        print("해당 시간을 찾지 못했습니다.")
+        logger.debug("해당 시간을 찾지 못했습니다.")
         return False
 
     def search_time(self, start_time, end_time):
@@ -79,18 +84,19 @@ class Reservation:
             try:
                 time_num = int(time_text.replace(" ", "").replace(":",""))
             except (ValueError, TypeError):
-                print(time_text + "정수로 변환할 수 없습니다.")
+                logger.debug(time_text + " 정수로 변환할 수 없습니다.")
                 continue
 
-            if  time_num >= start_time and time_num < end_time:
+            if  time_num >= start_time and time_num <= end_time:
                 bus = times.nth(i).locator("..")
 
                 remain = bus.locator("span.remain").inner_text().strip()
+                status = bus.locator("span.status").inner_text().strip()
 
-                print("시간:", time_text)
-                print("좌석:", remain)
+                logger.debug("시간:" + time_text)
+                logger.debug("좌석:" + remain)
 
-                if "매진" not in remain:
+                if "매진" not in status:
                     results.append({
                         "time": time_text,
                         "remain": remain
@@ -98,5 +104,8 @@ class Reservation:
             
         return results
     
+    def refresh(self):
+        self.page.get_by_role("button", name="새로고침").click()
+
     def select_seat(self):
         pass

@@ -1,4 +1,5 @@
 import logging
+from datetime import date
 
 logger = logging.getLogger(__name__)
 
@@ -30,9 +31,15 @@ class Reservation:
         self.page.get_by_role("button", name=destination).click()
         self.page.get_by_role("button", name="선택완료").click()
 
-    def select_date(self, date):
+    def select_date(self, start_date):
+        year, month, day = start_date.split("-")
+        today = date.today()
+        months_diff = (int(year) - today.year) * 12 + (int(month) - today.month)
+
         self.page.get_by_role("button", name="가는날 선택 달력").click()
-        self.page.get_by_role("link", name="24", exact=True).click()    
+        for i in range(months_diff):
+                    self.page.get_by_role("link", name="다음달").click()
+        self.page.get_by_role("link", name=day, exact=True).click()    
 
     def search(self):
         self.page.get_by_role("button", name="조회하기").click()
